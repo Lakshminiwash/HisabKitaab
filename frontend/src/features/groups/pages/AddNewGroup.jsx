@@ -40,22 +40,6 @@ export default function AddNewGroup() {
   const [category, setCategory] = useState('Trip')
   const [selectedIcon, setSelectedIcon] = useState('✈')
   const [currency, setCurrency] = useState('₹ (INR)')
-  const [memberInput, setMemberInput] = useState('')
-  const [members, setMembers] = useState(['Rohit', 'Vicky'])
-
-  const handleAddMember = () => {
-    if (memberInput.trim() && !members.includes(memberInput.trim())) {
-      setMembers([...members, memberInput.trim()])
-      setMemberInput('')
-    }
-  }
-
-  const handleKeyDown = (event) => {
-    if (event.key === 'Enter') {
-      event.preventDefault()
-      handleAddMember()
-    }
-  }
 
   return (
     <main className="relative flex h-full min-h-0 w-full items-center justify-center overflow-y-auto bg-[#020617] p-4 font-sans text-slate-100">
@@ -64,7 +48,7 @@ export default function AddNewGroup() {
       <div className="absolute h-72 w-72 rounded-full bg-amber-500/10 blur-3xl pointer-events-none" />
 
       {/* Main Card Wrapper - 80% Viewport Height */}
-      <div className="relative z-10 flex h-full max-h-[80vh] min-h-0 w-full max-w-[400px] flex-col justify-between overflow-hidden rounded-3xl border border-slate-800 bg-[#0F172A]/95 p-5 shadow-2xl backdrop-blur-xl">
+      <div className="relative z-10 flex h-full max-h-[60vh] min-h-0 w-full max-w-[400px] flex-col justify-between overflow-hidden rounded-3xl border border-slate-800 bg-[#0F172A]/95 p-5 shadow-2xl backdrop-blur-xl">
         
         {/* Header */}
         <header className="flex items-center justify-between pb-1">
@@ -149,44 +133,6 @@ export default function AddNewGroup() {
                 >
                   {icon}
                 </button>
-              ))}
-            </div>
-          </div>
-
-          {/* Add Members Section */}
-          <div>
-            <div className="flex items-center justify-between mb-1">
-              <p className="text-[13px] font-semibold text-slate-200">Add Members</p>
-              <span className="text-[11px] text-slate-400 flex items-center gap-1">
-                <Users size={12} /> {members.length + 1} Total
-              </span>
-            </div>
-            
-            <div className="flex items-center rounded-xl border border-slate-700 bg-[#020617]/80 px-3 focus-within:border-amber-500 transition">
-              <input 
-                value={memberInput} 
-                onChange={(e) => setMemberInput(e.target.value)} 
-                onKeyDown={handleKeyDown} 
-                placeholder="Enter name or phone" 
-                className="w-full bg-transparent py-2.5 text-[12px] outline-none placeholder:text-slate-500 text-white" 
-              />
-              <button
-                type="button"
-                onClick={handleAddMember}
-                className="ml-1 rounded-md bg-slate-800 px-2 py-1 text-[11px] font-bold text-amber-400 hover:bg-slate-700 transition"
-              >
-                <Plus size={14} />
-              </button>
-            </div>
-
-            <div className="mt-2 flex max-h-[52px] flex-wrap gap-1.5 overflow-y-auto no-scrollbar">
-              <MemberTag name="Rahul" you />
-              {members.map((member) => (
-                <MemberTag 
-                  key={member} 
-                  name={member} 
-                  onRemove={() => setMembers(members.filter((item) => item !== member))} 
-                />
               ))}
             </div>
           </div>

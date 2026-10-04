@@ -5,14 +5,19 @@ import GroupChat from "../features/chat/pages/GroupChat";
 import Profile from "../features/profile/pages/Profile";
 import Groups from "../features/groups/pages/Groups";
 import AddNewGroup from "../features/groups/pages/AddNewGroup"
+import LandingPage from "../features/auth/pages/LandingPage";
 
 export const routes = createBrowserRouter([
+    {
+        path:"/welcome",
+        element:<LandingPage/>
+    },
     {
         path:"/",
         element:<AppLayout/>,
         children:[
             {
-                index: true,
+                index:true,
                 element:<HomePage/>
             },
             {
