@@ -1,10 +1,13 @@
 import { Router } from "express";
+import { validateAuth } from "../validators/authValidator";
+import { addMemberSchema, createGroupSchema } from "../validators/groupValidator";
 
 const router = Router();
 
 // for create new group 
 // api/group/create 
-router.post("/create",)
+router.post("/create",validateAuth(createGroupSchema))
+router.post("/inviteMember",validateAuth(addMemberSchema))
 
 // for fetch all group of the logged in user 
 // api/group/my-groups 

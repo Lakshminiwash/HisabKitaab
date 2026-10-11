@@ -1,9 +1,10 @@
 import { Router } from "express";
+import {registerSchema, validateAuth } from "../validators/authValidator.js"
 const router = Router();
 
 // for create new account 
 // api/auth/register 
-router.post("/register",)
+router.post("/register",validateAuth(registerSchema),)
 
 // for login 
 // api/auth/login
