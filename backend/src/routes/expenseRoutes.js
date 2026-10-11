@@ -1,6 +1,6 @@
 import { Router } from "express";
-import { validateAuth } from "../validators/authValidator";
-import { expenseSchema } from "../validators/expenseValidator";
+import { validateAuth } from "../validators/authValidator.js";
+import { expenseSchema } from "../validators/expenseValidator.js";
 
 const router = Router();
 

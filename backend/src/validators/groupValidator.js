@@ -1,6 +1,6 @@
 const { z } = require('zod');
 
-const createGroupSchema = z.object({
+export const createGroupSchema = z.object({
     body: z.object({
         name: z.string().trim().min(2, 'minimum 2 characters are required'),
         description: z.string().trim().optional(),
@@ -9,10 +9,9 @@ const createGroupSchema = z.object({
     }),
 });
 
-const addMemberSchema = z.object({
+export const addMemberSchema = z.object({
     body: z.object({
         email: z.string().trim().toLowerCase().email('please enter valid email address'),
     }),
 });
 
-module.exports = { createGroupSchema, addMemberSchema };

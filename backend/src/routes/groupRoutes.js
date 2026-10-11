@@ -1,6 +1,6 @@
 import { Router } from "express";
-import { validateAuth } from "../validators/authValidator";
-import { addMemberSchema, createGroupSchema } from "../validators/groupValidator";
+import { validateAuth } from "../validators/authValidator.js";
+import { addMemberSchema, createGroupSchema } from "../validators/groupValidator.js";
 
 const router = Router();
 
