@@ -1,4 +1,4 @@
-const ApiError = require("../utils/apiError");
+import ApiError from "../utils/apiError.js";
 
 const errorHandler = (err, req, res, next) => {
     let error = { ...err };
@@ -24,7 +24,7 @@ const errorHandler = (err, req, res, next) => {
         const message = Object.values(err.errors).map(val => val.message).join(', ');
         error = new ApiError(400, message);
     }
-    
+
     const statusCode = error.statusCode || 500;
     
     // Do not leak internal error messages for 500s unless in development

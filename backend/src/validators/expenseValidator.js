@@ -1,4 +1,4 @@
-const { z } = require('zod');
+import {z} from "zod"
 
 export const expenseSchema = z.object({
     body: z.object({
