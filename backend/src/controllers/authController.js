@@ -34,7 +34,7 @@ async function generateToken(user, res, message) {
 // Register 
 export const Register = async (req, res, next) => {
     try {
-        const { username, email, password, contact } = req.body
+        const { userName, email, password, contact } = req.body
         const existingUser = await userModel.findOne({ email })
 
         if (existingUser) {
@@ -44,11 +44,10 @@ export const Register = async (req, res, next) => {
             })
         }
 
-        const hashedPass = await bcrypt.hash(password, 10)
         const user = await userModel.create({
             userName,
             email,
-            password: hashedPass,
+            password,
             contact
         })
 
@@ -75,9 +74,8 @@ export const Login = async (req, res, next) => {
             })
         }
 
-        const isPassMachted = await bcrypt.compare(password, user.password)
-
-        if (!isPassMachted) {
+        const isPassMatched = await bcrypt.compare(password, user.password)
+        if (!isPassMatched) {
             return res.status(400).json({
                 success: false,
                 message: "invalid email or password"
