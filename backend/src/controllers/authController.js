@@ -112,7 +112,7 @@ export const getMe = async (req, res, next) => {
     }
 }
 
-export const logOUt = async (req, res, next) => {
+export const logOut = async (req, res, next) => {
     try {
         res.clearCookie("token", {
             httpOnly: true,

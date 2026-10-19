@@ -1,7 +1,7 @@
 import { Router } from "express";
 import {loginSchema, registerSchema, validateAuth } from "../validators/authValidator.js"
 import { authenticateUser } from "../middleWares/authMiddleware.js";
-import { getMe, Login, logOUt, Register } from "../controllers/authController.js";
+import { getMe, Login, logOut, Register } from "../controllers/authController.js";
 const router = Router();
 
 // for create new account 
@@ -22,6 +22,6 @@ router.get("/getMe",authenticateUser,getMe)
 
 // for logout 
 // api/auth/logout 
-router.post("/logout",authenticateUser,logOUt)
+router.post("/logout",authenticateUser,logOut)
 
 export default router

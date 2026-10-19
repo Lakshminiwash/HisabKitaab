@@ -9,11 +9,11 @@ import LandingPage from "../features/auth/pages/LandingPage";
 
 export const routes = createBrowserRouter([
     {
-        path:"/welcome",
+        path:"/",
         element:<LandingPage/>
     },
     {
-        path:"/",
+        path:"/homePage",
         element:<AppLayout/>,
         children:[
             {
