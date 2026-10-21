@@ -70,7 +70,7 @@ export const Login = async (req, res, next) => {
         if (!user) {
             return res.status(400).json({
                 success: false,
-                message: "invalid email or password"
+                message: "user with this email does not exist"
             })
         }
 

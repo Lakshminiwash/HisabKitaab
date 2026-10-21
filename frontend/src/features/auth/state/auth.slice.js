@@ -20,7 +20,7 @@ const authSlice = createSlice({
         setError: (state, action) => {
             state.error = action.payload
             state.error = false;
-        },
+        },  
         setValidationError: (state, action) => {
             state.validationError = action.payload
         },

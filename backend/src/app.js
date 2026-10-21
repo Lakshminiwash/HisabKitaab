@@ -5,8 +5,16 @@ import chatRouter from "./routes/chatRoutes.js"
 import expenseRouter from "./routes/expenseRoutes.js"
 import groupRouter from "./routes/groupRoutes.js"
 import errorHandler from "./middleWares/globalErrorHandler.js"
+import cors from 'cors'
 
 const app = express()
+
+app.use(cors({
+    origin: "http://localhost:5173", // Aapke React frontend ka URL (Vite ka default port 5173 hota hai, apne hisab se change kar lena)
+    credentials: true,              // Cookies/Authorization headers allow karne ke liye
+    methods: ["GET", "POST", "PUT", "DELETE", "PATCH"],
+    allowedHeaders: ["Content-Type", "Authorization"]
+}));
 
 app.use(express.json())
 app.use(cookieParser())
