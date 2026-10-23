@@ -26,7 +26,7 @@ async function generateToken(user, res, message) {
             id: user._id,
             email: user.email,
             contact: user.contact,
-            userName: user.fullName
+            userName: user.userName
         }
     })
 }

@@ -33,3 +33,8 @@ export async function login({ email, password }) {
         throw error?.response?.data ;
     }
 }
+
+export async function getMe() {
+    const response = await api.get("/api/auth/getMe")
+    return response.data;
+}

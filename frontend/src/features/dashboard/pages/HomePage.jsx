@@ -1,16 +1,8 @@
 'use client'
 
 import { useState } from 'react'
-import {
-  Bell,
-  CircleDollarSign,
-  Filter,
-  Plus,
-  Receipt,
-  TrendingDown,
-  TrendingUp,
-  X,
-} from 'lucide-react'
+import {Bell,CircleDollarSign,Plus,Receipt,TrendingDown,TrendingUp,X} from 'lucide-react'
+import { useSelector } from 'react-redux'
 
 const initialGroups = [
   {
@@ -108,6 +100,9 @@ function BalanceCard({ label, amount, tone, direction }) {
 
 export default function HomePage() {
   const [filterOpen, setFilterOpen] = useState(true)
+
+  const user = useSelector(state => state.auth.user)
+  console.log(user.userName)
   const [showNotifications, setShowNotifications] = useState(false)
   const [notifications, setNotifications] = useState(sampleNotifications)
 
@@ -145,7 +140,7 @@ export default function HomePage() {
               </div>
               <div>
                 <p className="text-[11px] font-medium text-slate-500">Good evening,</p>
-                <h1 className="text-[17px] font-semibold tracking-tight text-slate-100">Rahul</h1>
+                <h1 className="text-[17px] font-semibold tracking-tight text-slate-100">rahul</h1>
               </div>
             </div>
 
@@ -172,8 +167,8 @@ export default function HomePage() {
               <CircleDollarSign size={20} className="mb-1 text-amber-500/80" />
             </div>
             <div className="flex gap-3">
-              <BalanceCard label="YOU ARE OWED" amount="₹2,400" tone="credit" direction="up" />
-              <BalanceCard label="YOU OWE" amount="₹800" tone="debt" direction="down" />
+              <BalanceCard label="YOU NEED TO RECEIVE" amount="₹2,400" tone="credit" direction="up" />
+              <BalanceCard label="YOU NEED TO PAY" amount="₹800" tone="debt" direction="down" />
             </div>
           </section>
 
