@@ -44,7 +44,6 @@ export function useAuth() {
 
     async function handleGetMe() {
         try {
-            dispatch(setError(null))
             dispatch(setLoading(true))
             const data = await getMe()
             dispatch(setUser(data.user));

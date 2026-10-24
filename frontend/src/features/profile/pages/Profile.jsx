@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import { useSelector } from 'react-redux'
 import {
   Bell,
   Check,
@@ -90,7 +91,18 @@ function SettingRow({ icon, label, detail, danger, children }) {
 }
 
 export default function Profile() {
+  const user = useSelector(state => state.auth.user?.userName)
+
   const [darkMode, setDarkMode] = useState(true)
+  const profileName = user || 'Guest'
+  const profileInitials = profileName
+    .trim()
+    .split(/\s+/)
+    .filter(Boolean)
+    .slice(0, 2)
+    .map(part => part[0])
+    .join('')
+    .toUpperCase()
 
   // Profile Edit State
   const [showEditModal, setShowEditModal] = useState(false)
@@ -107,7 +119,12 @@ export default function Profile() {
   const [showActivitiesModal, setShowActivitiesModal] = useState(false)
 
   const handleOpenEdit = () => {
-    setEditForm({ ...userInfo })
+    setEditForm({
+      ...userInfo,
+      name: user?.userName || userInfo.name,
+      email: user?.email || userInfo.email,
+      phone: user?.contact || userInfo.phone,
+    })
     setShowEditModal(true)
   }
 
@@ -151,14 +168,14 @@ export default function Profile() {
           <div className="rounded-2xl border border-slate-800/90 bg-[#0c1427]/90 p-4.5 shadow-xl backdrop-blur-md">
             <div className="flex items-center gap-3.5">
               <div className="flex h-16 w-16 items-center justify-center rounded-2xl border-2 border-amber-500/50 bg-gradient-to-br from-amber-500/20 to-amber-600/10 text-xl font-bold text-amber-300 shadow-[0_0_15px_rgba(245,158,11,0.15)]">
-                {userInfo.initials}
+                {profileInitials || 'G'}
               </div>
               <div className="min-w-0 flex-1">
                 <h2 className="text-lg font-bold text-white tracking-tight truncate">
-                  {userInfo.name}
+                  {profileName}
                 </h2>
                 <p className="mt-0.5 text-xs text-slate-400 font-medium truncate">
-                  {userInfo.email}
+                  {user?.email || 'No email available'}
                 </p>
               </div>
             </div>

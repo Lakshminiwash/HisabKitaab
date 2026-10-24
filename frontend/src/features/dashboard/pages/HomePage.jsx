@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import {Bell,CircleDollarSign,Plus,Receipt,TrendingDown,TrendingUp,X} from 'lucide-react'
+import { Bell, CircleDollarSign, Plus, Receipt, TrendingDown, TrendingUp, X } from 'lucide-react'
 import { useSelector } from 'react-redux'
 
 const initialGroups = [
@@ -101,8 +101,8 @@ function BalanceCard({ label, amount, tone, direction }) {
 export default function HomePage() {
   const [filterOpen, setFilterOpen] = useState(true)
 
-  const user = useSelector(state => state.auth.user)
-  console.log(user.userName)
+  const user = useSelector((state) => state.auth.user?.userName);
+
   const [showNotifications, setShowNotifications] = useState(false)
   const [notifications, setNotifications] = useState(sampleNotifications)
 
@@ -140,7 +140,7 @@ export default function HomePage() {
               </div>
               <div>
                 <p className="text-[11px] font-medium text-slate-500">Good evening,</p>
-                <h1 className="text-[17px] font-semibold tracking-tight text-slate-100">rahul</h1>
+                <h1 className="text-[17px] font-semibold tracking-tight text-slate-100">{user}</h1>
               </div>
             </div>
 
