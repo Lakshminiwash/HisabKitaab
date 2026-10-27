@@ -1,24 +1,10 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useSelector } from 'react-redux'
-import {
-  Bell,
-  Check,
-  ChevronRight,
-  Edit3,
-  Info,
-  LogOut,
-  Moon,
-  MoreHorizontal,
-  Wallet,
-  Sparkles,
-  X,
-  User,
-  Mail,
-  Phone,
-  Calendar,
-} from 'lucide-react'
+import { Bell, Check, ChevronRight, Edit3, Info, LogOut, Moon, MoreHorizontal, Wallet, Sparkles, X, User, Mail, Phone } from 'lucide-react'
+import { useAuth } from '../../auth/hooks/useAuth'
+import { useNavigate } from 'react-router-dom'
 
 // Sample list of 10 recent activities
 const allActivitiesData = [
@@ -37,64 +23,69 @@ const allActivitiesData = [
 function ActivityRow({ icon, tone, children, status, statusTone }) {
   return (
     <div className="flex items-start gap-3.5 border-b border-slate-800/70 py-4 last:border-0">
-      <div
-        className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-white/5 shadow-sm ${tone}`}
-      >
+      <div className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-white/5 shadow-sm ${tone}`}>
         {icon}
       </div>
       <div className="min-w-0 flex-1">
         <p className="text-[13px] leading-relaxed text-slate-200">{children}</p>
-        <span
-          className={`mt-2 inline-flex items-center gap-1.5 rounded-full px-2.5 py-0.5 text-[10px] font-bold ${statusTone}`}
-        >
+        <span className={`mt-2 inline-flex items-center gap-1.5 rounded-full px-2.5 py-0.5 text-[10px] font-bold ${statusTone}`}>
           {status === 'Settled' ? <Check size={12} /> : <Info size={12} />}
           {status}
         </span>
       </div>
-      <button
-        type="button"
-        aria-label="More options"
-        className="rounded-lg p-1 text-slate-500 transition hover:bg-slate-800 hover:text-slate-300"
-      >
+      <button type="button" aria-label="More options" className="rounded-lg p-1 text-slate-500 transition hover:bg-slate-800 hover:text-slate-300">
         <MoreHorizontal size={16} />
       </button>
     </div>
   )
 }
 
-function SettingRow({ icon, label, detail, danger, children }) {
+function SettingRow({ icon, label, detail, danger, onClick, children }) {
   return (
-    <button
-      type="button"
-      className="flex w-full items-center gap-3.5 border-b border-slate-800/70 py-4 text-left transition hover:opacity-90 last:border-0"
+    <div
+      onClick={onClick}
+      className={`flex w-full items-center gap-3.5 border-b border-slate-800/70 py-4 text-left transition ${onClick ? 'cursor-pointer hover:bg-slate-800/40' : ''
+        } px-1 last:border-0`}
     >
-      <div
-        className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-white/5 shadow-sm ${danger
-          ? 'border-rose-500/30 bg-rose-500/10 text-rose-400'
-          : 'bg-slate-800/80 text-slate-300'
-          }`}
-      >
+      <div className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-white/5 shadow-sm ${danger ? 'border-rose-500/30 bg-rose-500/10 text-rose-400' : 'bg-slate-800/80 text-slate-300'
+        }`}>
         {icon}
       </div>
       <div className="min-w-0 flex-1">
-        <p
-          className={`text-[13px] font-semibold ${danger ? 'text-rose-400' : 'text-slate-100'
-            }`}
-        >
+        <p className={`text-[13px] font-semibold ${danger ? 'text-rose-400' : 'text-slate-100'}`}>
           {label}
         </p>
         {detail && <p className="mt-0.5 text-[11px] text-slate-400">{detail}</p>}
       </div>
       {children || <ChevronRight size={16} className="text-slate-500" />}
-    </button>
+    </div>
   )
 }
 
 export default function Profile() {
-  const user = useSelector(state => state.auth.user?.userName)
+  const auth = useAuth()
+  const navigate = useNavigate()
+
+  const userName = useSelector(state => state.auth.user?.userName)
+  const email = useSelector(state => state.auth.user?.email)
+  const contact = useSelector(state => state.auth.user?.contact)
 
   const [darkMode, setDarkMode] = useState(true)
-  const profileName = user || 'Guest'
+  const [showEditModal, setShowEditModal] = useState(false)
+
+  // Form input states
+  const [editUserName, setEditUserName] = useState('')
+  const [editContact, setEditContact] = useState('')
+
+  // Jab Redux se user data load ho jaye, tab local state ko update karein
+  useEffect(() => {
+    if (userName) setEditUserName(userName)
+    if (contact) setEditContact(contact)
+  }, [userName, contact])
+
+  const [showActivitiesModal, setShowActivitiesModal] = useState(false)
+
+  const profileName = userName || 'Guest'
   const profileInitials = profileName
     .trim()
     .split(/\s+/)
@@ -104,54 +95,34 @@ export default function Profile() {
     .join('')
     .toUpperCase()
 
-  // Profile Edit State
-  const [showEditModal, setShowEditModal] = useState(false)
-  const [userInfo, setUserInfo] = useState({
-    name: 'Rahul Sharma',
-    email: 'rahul.sharma@example.com',
-    phone: '+91 98765 43210',
-    memberSince: 'Jan 2026',
-    initials: 'RS',
-  })
-  const [editForm, setEditForm] = useState({ ...userInfo })
-
-  // View All Activities Modal State
-  const [showActivitiesModal, setShowActivitiesModal] = useState(false)
-
   const handleOpenEdit = () => {
-    setEditForm({
-      ...userInfo,
-      name: user?.userName || userInfo.name,
-      email: user?.email || userInfo.email,
-      phone: user?.contact || userInfo.phone,
-    })
     setShowEditModal(true)
   }
 
-  const handleSaveProfile = (e) => {
+  const handleSaveProfile = async (e) => {
     e.preventDefault()
-    const parts = editForm.name.trim().split(' ')
-    const initials = parts.length >= 2
-      ? `${parts[0][0]}${parts[1][0]}`.toUpperCase()
-      : (parts[0]?.[0] || 'R').toUpperCase()
-
-    setUserInfo({
-      ...editForm,
-      initials,
+    let result = await auth.handleUpdateProfile({
+      userName: editUserName,
+      contact : editContact
     })
-    setShowEditModal(false)
+
+    if(result){
+      setShowEditModal(false)
+    }
+  }
+
+  const logOutHandler = () => {
+    auth.handleLogOut()
+    navigate("/")
   }
 
   return (
     <main className="h-full min-h-0 bg-[#0F172A] text-slate-100 sm:flex sm:justify-center sm:px-0">
       <div className="relative flex max-w-[480px] h-full min-h-0 w-full flex-col overflow-hidden border border-slate-800/70 bg-[#020617] shadow-2xl shadow-black/30">
+
         {/* Header */}
         <header className="sticky top-0 z-20 flex items-center justify-between border-b border-slate-800/70 bg-[#0c1427]/90 px-5 pb-4 pt-7 backdrop-blur-xl">
-          <div className="flex items-center gap-3">
-            <h1 className="text-xl font-bold text-white tracking-wide">
-              Profile
-            </h1>
-          </div>
+          <h1 className="text-xl font-bold text-white tracking-wide">Profile</h1>
           <button
             type="button"
             aria-label="Edit profile"
@@ -164,6 +135,7 @@ export default function Profile() {
 
         {/* Scrollable Body */}
         <section className="min-h-0 flex-1 overflow-y-auto bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-amber-500/5 via-[#080e1a] to-[#050914] px-5 pb-6 pt-5">
+
           {/* User Details Card */}
           <div className="rounded-2xl border border-slate-800/90 bg-[#0c1427]/90 p-4.5 shadow-xl backdrop-blur-md">
             <div className="flex items-center gap-3.5">
@@ -175,13 +147,13 @@ export default function Profile() {
                   {profileName}
                 </h2>
                 <p className="mt-0.5 text-xs text-slate-400 font-medium truncate">
-                  {user?.email || 'No email available'}
+                  {email || 'No email available'}
                 </p>
               </div>
             </div>
             <div className="mt-4 flex flex-wrap gap-2 pt-1 border-t border-slate-800/60">
               <span className="rounded-lg border border-slate-700/60 bg-slate-800/40 px-3 py-1 text-[10px] font-medium text-slate-300">
-                Member since {userInfo.memberSince}
+                Member since Jan 2026
               </span>
               <span className="rounded-lg border border-emerald-500/30 bg-emerald-500/10 px-3 py-1 text-[10px] font-semibold text-emerald-300">
                 12 Active Groups
@@ -194,18 +166,13 @@ export default function Profile() {
             <div className="absolute right-0 top-0 h-28 w-28 rounded-full bg-amber-500/10 blur-2xl pointer-events-none" />
             <div className="flex items-center justify-between">
               <p className="text-[11px] font-bold uppercase tracking-widest text-amber-400/90 flex items-center gap-1.5">
-                <Sparkles size={12} />
-                Financial Summary
+                <Sparkles size={12} /> Financial Summary
               </p>
             </div>
             <div className="mt-3 flex items-end justify-between">
               <div>
-                <p className="text-2xl font-extrabold tracking-tight text-white">
-                  ₹42,500
-                </p>
-                <p className="mt-1 text-xs font-medium text-slate-400">
-                  Total Settled Expenses
-                </p>
+                <p className="text-2xl font-extrabold tracking-tight text-white">₹42,500</p>
+                <p className="mt-1 text-xs font-medium text-slate-400">Total Settled Expenses</p>
               </div>
               <div className="flex h-11 w-11 items-center justify-center rounded-xl border border-amber-500/30 bg-amber-500/15 text-amber-400 shadow-[0_0_12px_rgba(245,158,11,0.2)]">
                 <Wallet size={20} />
@@ -216,9 +183,7 @@ export default function Profile() {
           {/* Recent Activity */}
           <section className="mt-6">
             <div className="mb-2 flex items-center justify-between px-1">
-              <h2 className="text-xs font-bold uppercase tracking-wider text-slate-400">
-                Recent Activity
-              </h2>
+              <h2 className="text-xs font-bold uppercase tracking-wider text-slate-400">Recent Activity</h2>
               <button
                 type="button"
                 onClick={() => setShowActivitiesModal(true)}
@@ -249,9 +214,7 @@ export default function Profile() {
 
           {/* Quick Settings */}
           <section className="mt-6">
-            <h2 className="mb-2 px-1 text-xs font-bold uppercase tracking-wider text-slate-400">
-              Quick Settings
-            </h2>
+            <h2 className="mb-2 px-1 text-xs font-bold uppercase tracking-wider text-slate-400">Quick Settings</h2>
             <div className="rounded-2xl border border-slate-800/90 bg-[#0c1427]/80 px-4 shadow-md backdrop-blur-md">
               <SettingRow icon={<Moon size={18} />} label="Dark Mode">
                 <button
@@ -265,17 +228,23 @@ export default function Profile() {
                   className={`relative inline-flex h-6 w-11 shrink-0 cursor-pointer items-center rounded-full p-0.5 transition-colors duration-200 ease-in-out focus:outline-none ${darkMode ? 'bg-emerald-500' : 'bg-slate-700'
                     }`}
                 >
-                  <span
-                    className={`inline-block h-5 w-5 rounded-full bg-white shadow-md transition-transform duration-200 ease-in-out ${darkMode ? 'translate-x-5' : 'translate-x-0'
-                      }`}
-                  />
+                  <span className={`inline-block h-5 w-5 rounded-full bg-white shadow-md transition-transform duration-200 ease-in-out ${darkMode ? 'translate-x-5' : 'translate-x-0'
+                    }`} />
                 </button>
               </SettingRow>
+
               <SettingRow
                 icon={<Bell size={18} />}
                 label="Notification Preferences"
+                onClick={() => console.log("Notification clicked")}
               />
-              <SettingRow icon={<LogOut size={18} />} label="Logout" danger>
+
+              <SettingRow
+                icon={<LogOut size={18} />}
+                label="Logout"
+                danger
+                onClick={logOutHandler}
+              >
                 <ChevronRight size={16} className="text-rose-400/80" />
               </SettingRow>
             </div>
@@ -304,9 +273,9 @@ export default function Profile() {
                   </label>
                   <input
                     type="text"
-                    required
-                    value={editForm.name}
-                    onChange={(e) => setEditForm({ ...editForm, name: e.target.value })}
+                    name="editUserName"
+                    value={editUserName}
+                    onChange={(e) => setEditUserName(e.target.value)}
                     className="w-full rounded-xl border border-slate-800 bg-slate-900/90 px-3 py-2 text-xs text-white outline-none focus:border-amber-500"
                   />
                 </div>
@@ -317,10 +286,9 @@ export default function Profile() {
                   </label>
                   <input
                     type="email"
-                    required
-                    value={editForm.email}
-                    onChange={(e) => setEditForm({ ...editForm, email: e.target.value })}
-                    className="w-full rounded-xl border border-slate-800 bg-slate-900/90 px-3 py-2 text-xs text-white outline-none focus:border-amber-500"
+                    value={email || "hello@gmail.com"}
+                    readOnly
+                    className="w-full rounded-xl border border-slate-800/80 bg-slate-900/40 px-3 py-2 text-xs text-slate-400 outline-none cursor-not-allowed"
                   />
                 </div>
 
@@ -329,21 +297,10 @@ export default function Profile() {
                     <Phone size={13} className="text-amber-400" /> Phone Number
                   </label>
                   <input
-                    type="text"
-                    value={editForm.phone}
-                    onChange={(e) => setEditForm({ ...editForm, phone: e.target.value })}
-                    className="w-full rounded-xl border border-slate-800 bg-slate-900/90 px-3 py-2 text-xs text-white outline-none focus:border-amber-500"
-                  />
-                </div>
-
-                <div>
-                  <label className="block mb-1 text-xs font-semibold text-slate-300 flex items-center gap-1.5">
-                    <Calendar size={13} className="text-amber-400" /> Member Since
-                  </label>
-                  <input
-                    type="text"
-                    value={editForm.memberSince}
-                    onChange={(e) => setEditForm({ ...editForm, memberSince: e.target.value })}
+                    type="tel"
+                    name="editContact"
+                    value={editContact}
+                    onChange={(e) => setEditContact(e.target.value)}
                     className="w-full rounded-xl border border-slate-800 bg-slate-900/90 px-3 py-2 text-xs text-white outline-none focus:border-amber-500"
                   />
                 </div>
@@ -368,7 +325,7 @@ export default function Profile() {
           </div>
         )}
 
-        {/* ----------------- VIEW ALL ACTIVITIES MODAL (10 ITEMS) ----------------- */}
+        {/* ----------------- VIEW ALL ACTIVITIES MODAL ----------------- */}
         {showActivitiesModal && (
           <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/75 px-4 backdrop-blur-sm">
             <div className="w-full max-w-[400px] overflow-hidden rounded-2xl border border-slate-800 bg-[#020617] shadow-2xl">

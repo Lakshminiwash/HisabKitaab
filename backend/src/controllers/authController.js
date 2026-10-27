@@ -2,6 +2,7 @@ import jwt from "jsonwebtoken"
 import { config } from "../configs/config.js"
 import userModel from "../models/userModel.js"
 import bcrypt from "bcryptjs"
+import User from "../models/userModel.js"
 
 // for token generation 
 async function generateToken(user, res, message) {
@@ -56,8 +57,6 @@ export const Register = async (req, res, next) => {
     } catch (error) {
         next(error)
     }
-
-
 }
 
 // Login 
@@ -112,6 +111,7 @@ export const getMe = async (req, res, next) => {
     }
 }
 
+// logout
 export const logOut = async (req, res, next) => {
     try {
         res.clearCookie("token", {
@@ -125,6 +125,32 @@ export const logOut = async (req, res, next) => {
             success: true,
             message: "Logged out successfully"
         })
+    } catch (error) {
+        next(error)
+    }
+}
+
+// updateprofile
+export const UpdateProfile = async (req, res, next) => {
+    try {
+        const userId = req.user._id;
+        console.log(userId)
+        const { userName, contact } = req.body;
+        const updateData = {};
+        if (userName) updateData.userName = userName;
+        if (contact) updateData.contact = contact;
+
+        const updatedUser = await User.findByIdAndUpdate(
+            userId,
+            { $set: updateData },
+            { new: true }
+        ).select("-password");
+
+        return res.status(200).json({
+            success: true,
+            message: "Profile updated successfully!",
+            user: updatedUser
+        });
     } catch (error) {
         next(error)
     }

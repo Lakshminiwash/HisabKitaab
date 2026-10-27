@@ -1,7 +1,7 @@
 import { Router } from "express";
-import {loginSchema, registerSchema, validateAuth } from "../validators/authValidator.js"
+import {loginSchema, registerSchema, updateSchema, validateAuth } from "../validators/authValidator.js"
 import { authenticateUser } from "../middleWares/authMiddleware.js";
-import { getMe, Login, logOut, Register } from "../controllers/authController.js";
+import { getMe, Login, logOut, Register, UpdateProfile } from "../controllers/authController.js";
 const router = Router();
 
 // for create new account 
@@ -18,10 +18,10 @@ router.get("/getMe",authenticateUser,getMe)
 
 // for update user profile 
 // api/auth/updateProfile 
-// router.patch("/updateProfile",)
+router.patch("/updateProfile",authenticateUser,validateAuth(updateSchema),UpdateProfile)
 
 // for logout 
 // api/auth/logout 
-router.post("/logout",authenticateUser,logOut)
+router.post("/logOut",authenticateUser,logOut)
 
 export default router

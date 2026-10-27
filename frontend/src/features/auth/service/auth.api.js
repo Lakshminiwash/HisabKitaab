@@ -30,7 +30,19 @@ export async function login({ email, password }) {
 
         return response.data
     } catch (error) {
-        throw error?.response?.data ;
+        throw error?.response?.data;
+    }
+}
+
+export async function updateProfile({ userName, contact }) {
+    try {
+        const response = await api.patch("/api/auth/updateProfile", {
+            userName,
+            contact,
+        })
+        return response.data
+    } catch (error) {
+        throw error?.response
     }
 }
 
@@ -38,3 +50,9 @@ export async function getMe() {
     const response = await api.get("/api/auth/getMe")
     return response.data;
 }
+
+export async function logOut() {
+    const response = await api.post("/api/auth/logOut");
+    return response.data;
+}
+

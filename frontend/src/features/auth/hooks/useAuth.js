@@ -1,6 +1,6 @@
 import { useDispatch, useSelector } from "react-redux";
-import { getMe, login, register } from "../service/auth.api";
-import { setError, setLoading, setUser, setValidationError } from "../state/auth.slice";
+import { getMe, login, logOut, register, updateProfile } from "../service/auth.api";
+import { logoutUser, setError, setLoading, setUser, setValidationError } from "../state/auth.slice";
 
 
 export function useAuth() {
@@ -20,6 +20,25 @@ export function useAuth() {
             dispatch(setError(error || "registration failed"))
             dispatch(setValidationError(error || []))
             alert(error?.data?.message || error?.data?.errors[0]?.message)
+        } finally {
+            dispatch(setLoading(false))
+        }
+    }
+
+    async function handleUpdateProfile({ userName, contact }) {
+        try {
+            dispatch(setLoading(true))
+            dispatch(setError(null))
+            dispatch(setValidationError([]))
+            const data = await updateProfile({ userName, contact })
+            dispatch(setUser(data.user))
+            alert(data.message)
+            return data.user
+        } catch (error) {
+            dispatch(setError(error || "updation failed"))
+            // console.log()
+            dispatch(setValidationError(error || []))
+            alert(error?.data?.errors[0]?.message)
         } finally {
             dispatch(setLoading(false))
         }
@@ -49,14 +68,25 @@ export function useAuth() {
             dispatch(setUser(data.user));
         } catch (error) {
             dispatch(setError(error.response?.data?.message || "Failed to fetch user data"))
-        }finally{
+        } finally {
             dispatch(setLoading(false))
+        }
+    }
+
+    async function handleLogOut() {
+        try {
+            await logOut();
+            dispatch(logoutUser())
+        } catch (error) {
+            console.log(error)
         }
     }
 
     return {
         handleRegister,
         handleLogin,
-        handleGetMe
+        handleGetMe,
+        handleLogOut,
+        handleUpdateProfile,
     }
 }

@@ -16,6 +16,13 @@ export const loginSchema = z.object({
     })
 });
 
+export const updateSchema = z.object({
+    body: z.object({
+        userName: z.string().min(3, "minimum 3 characters required in name").max(35, "maximum 35 characters").optional(),
+        contact: z.string().regex(/^[6-9]\d{9}$/, "Invalid phone number").optional().or(z.literal(''))
+    })
+});
+
 export const validateAuth = (schema) => {
     return async (req, res, next) => {
         try {
