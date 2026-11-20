@@ -2,10 +2,9 @@ import {z} from "zod";
 
 export const createGroupSchema = z.object({
     body: z.object({
-        name: z.string().trim().min(2, 'minimum 2 characters are required'),
-        description: z.string().trim().optional(),
-        category: z.enum(['Trip', 'Home', 'Couple', 'Event', 'Other']).optional().default('Home'),
-        members: z.array(z.string().trim()).min(1, 'at least one member are compulsory'),
+        groupName: z.string().trim().min(2, 'minimum 2 characters are required'),
+        category: z.enum(['Trip', 'Home', 'Dining', 'Event']).optional().default('Home'),
+        currency: z.enum(['INR', 'USD', 'EUR']).optional().default('INR'),
     }),
 });
 

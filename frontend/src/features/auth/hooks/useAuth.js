@@ -1,8 +1,17 @@
-import { useDispatch, useSelector } from "react-redux";
+import { useDispatch } from "react-redux";
 import { getMe, login, logOut, register, updateProfile } from "../service/auth.api";
 import { logoutUser, setError, setLoading, setUser, setValidationError } from "../state/auth.slice";
 
+function getErrorMessage(error, fallback) {
+    const data = error?.data || error?.response?.data || error;
+    const firstError = Array.isArray(data?.errors) ? data.errors[0] : null;
+    const message = data?.message
+        || (typeof firstError === "string" ? firstError : firstError?.message)
+        || error?.message;
 
+    return typeof message === "string" ? message : fallback;
+}
+    
 export function useAuth() {
     const dispatch = useDispatch();
 
@@ -17,9 +26,10 @@ export function useAuth() {
             return data.user;
 
         } catch (error) {
-            dispatch(setError(error || "registration failed"))
+            const message = getErrorMessage(error, "Registration failed")
+            dispatch(setError(message))
             dispatch(setValidationError(error || []))
-            alert(error?.data?.message || error?.data?.errors[0]?.message)
+            alert(message)
         } finally {
             dispatch(setLoading(false))
         }
@@ -35,10 +45,10 @@ export function useAuth() {
             alert(data.message)
             return data.user
         } catch (error) {
-            dispatch(setError(error || "updation failed"))
-            // console.log()
+            const message = getErrorMessage(error, "Profile update failed")
+            dispatch(setError(message))
             dispatch(setValidationError(error || []))
-            alert(error?.data?.errors[0]?.message)
+            alert(message)
         } finally {
             dispatch(setLoading(false))
         }
@@ -54,8 +64,10 @@ export function useAuth() {
             return data.user
 
         } catch (error) {
-            dispatch(setError(error || "login failed"))
-            alert(error?.message || error?.errors[0]?.message)
+            const message = getErrorMessage(error, "Login failed")
+            dispatch(setError(message))
+            dispatch(setValidationError(error || []))
+            alert(message)
         } finally {
             dispatch(setLoading(false))
         }
@@ -67,19 +79,15 @@ export function useAuth() {
             const data = await getMe()
             dispatch(setUser(data.user));
         } catch (error) {
-            dispatch(setError(error.response?.data?.message || "Failed to fetch user data"))
+            dispatch(setError(getErrorMessage(error, "Failed to fetch user data")))
         } finally {
             dispatch(setLoading(false))
         }
     }
 
     async function handleLogOut() {
-        try {
-            await logOut();
-            dispatch(logoutUser())
-        } catch (error) {
-            console.log(error)
-        }
+        await logOut();
+        dispatch(logoutUser())
     }
 
     return {

@@ -236,7 +236,6 @@ export default function Profile() {
               <SettingRow
                 icon={<Bell size={18} />}
                 label="Notification Preferences"
-                onClick={() => console.log("Notification clicked")}
               />
 
               <SettingRow

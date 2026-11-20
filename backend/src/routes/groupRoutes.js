@@ -1,12 +1,14 @@
 import { Router } from "express";
 import { validateAuth } from "../validators/authValidator.js";
 import { addMemberSchema, createGroupSchema } from "../validators/groupValidator.js";
+import { authenticateUser } from "../middleWares/authMiddleware.js";
+import { creatNewGroup } from "../controllers/groupController.js";
 
 const router = Router();
 
 // for create new group 
 // api/group/create 
-// router.post("/create",validateAuth(createGroupSchema))
+router.post("/create",authenticateUser,validateAuth(createGroupSchema),creatNewGroup)
 // router.post("/inviteMember",validateAuth(addMemberSchema))
 
 // for fetch all group of the logged in user 

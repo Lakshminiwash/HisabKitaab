@@ -8,7 +8,7 @@ const groupSchema = new mongoose.Schema({
     },
     category: {
         type: String,
-        enum: ['Trip', 'Home', 'Couple', 'Event', 'Other'],
+        enum: ['Trip', 'Home', 'Dining', 'Event'],
         default: "Home",
     },
     createdBy: {
@@ -19,11 +19,6 @@ const groupSchema = new mongoose.Schema({
         type: String,
         default: "INR",
     },
-    status: {
-        type: String,
-        enum: ['ACTIVE', 'ARCHIVED'],
-        default: 'ACTIVE',
-    }
 }, { timestamps: true })
 
 const groupModel = new mongoose.model("groups", groupSchema)
