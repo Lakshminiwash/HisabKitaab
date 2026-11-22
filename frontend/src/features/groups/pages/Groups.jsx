@@ -1,24 +1,24 @@
 'use client'
 
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import {
   ArrowLeft,
   Check,
-  ChevronRight,
   CirclePlus,
   Home,
   IndianRupee,
-  Plus,
   Search,
   Users,
   X,
 } from 'lucide-react'
+import { useSelector } from 'react-redux'
+import { useCreateGroup } from '../hooks/useNewGroup'
 
-const groups = [
-  { id: 1, name: '3BHK Flatmates', members: ['R', 'V', 'A', 'N'], status: 'You owe ₹300', tone: 'debt', detail: 'WiFi Bill', total: '₹8,500' },
-  { id: 2, name: 'Goa Trip 2026', members: ['R', 'V', 'A'], status: 'Rohit owes you ₹1,500', tone: 'positive', detail: 'Dinner at Thalassa', total: '₹18,400' },
-  { id: 3, name: 'Friday Pizza Night', members: ['R', 'V'], status: 'Settled Up', tone: 'settled', detail: 'Pizza order', total: '₹2,400' },
-]
+// const groupsall = [
+//   { id: 1, name: '3BHK Flatmates', members: ['R', 'V', 'A', 'N'], status: 'You owe ₹300', tone: 'debt', total: '₹8,500' },
+//   { id: 2, name: 'Goa Trip 2026', members: ['R', 'V', 'A'], status: 'Rohit owes you ₹1,500', tone: 'positive', total: '₹18,400' },
+//   { id: 3, name: 'Friday Pizza Night', members: ['R', 'V'], status: 'Settled Up', tone: 'settled', total: '₹2,400' },
+// ]
 
 const expenses = [
   { id: 1, title: 'WiFi Bill', meta: 'Paid by Rohit', amount: '₹1,000', date: '28 Sep', color: 'bg-amber-500/15 text-amber-300' },
@@ -34,13 +34,51 @@ function Avatar({ letter, index }) {
 export default function Groups() {
   const [selectedGroup, setSelectedGroup] = useState(null)
   const [query, setQuery] = useState('')
-  const visibleGroups = groups.filter((group) => group.name.toLowerCase().includes(query.toLowerCase()))
+  const { groups, loading } = useSelector((state) => state.createNewGroup);
+  const visibleGroups = groups.filter((group) => group.
+    groupName
+    .toLowerCase().includes(query.toLowerCase()))
 
   const handleInvite = (e, groupName) => {
     // Stop the event from bubbling up to the group card click handler
     e.stopPropagation()
     alert(`Invite link generated for ${groupName}!`)
   }
+
+  const { handleGetAllGroups } = useCreateGroup();
+
+  // Auth loading/user (getMe check ke liye)
+  const { user, loading: authLoading } = useSelector((state) => state.auth);
+
+  // Group slice se groups, loading, aur error nikalna
+
+  useEffect(() => {
+    // Jab tak initial auth/getMe check chal raha ho, tab tak wait karo
+    if (!authLoading && user) {
+      handleGetAllGroups();
+    }
+  }, [authLoading, user]);
+
+  // 1. Auth ya groups load ho rahe hon toh safe loading state
+  if (authLoading || loading) {
+    return (
+      <div className="p-4 text-sm text-slate-400">
+        Loading your groups...
+      </div>
+    );
+  }
+
+  const groupList = Array.isArray(groups) ? groups : [];
+
+  // 4. Empty state agar koi group nahi hai
+  if (groupList.length === 0) {
+    return (
+      <div className="p-4 text-sm text-slate-400">
+        No groups found yet. Create your first group to start splitting expenses.
+      </div>
+    );
+  }
+
 
   return (
     <main className="h-full min-h-dvh bg-[#0F172A] text-slate-100 sm:flex sm:justify-center sm:px-0">
@@ -75,7 +113,6 @@ export default function Groups() {
             <section className="min-h-0 flex-1 space-y-3 overflow-y-auto px-5 py-3">
               <div className="mb-4 flex items-center justify-between">
                 <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-slate-500">Your groups</p>
-                <span className="text-[10px] text-slate-600">{visibleGroups.length} active</span>
               </div>
 
               {visibleGroups.map((group) => (
@@ -90,9 +127,9 @@ export default function Groups() {
                         <Users size={17} />
                       </span>
                       <div>
-                        <h2 className="text-[14px] font-semibold">{group.name}</h2>
+                        <h2 className="text-[14px] font-semibold">{group.groupName}</h2>
                         <p className="mt-0.5 text-[10px] text-slate-500">
-                          {group.members.length} members · {group.detail}
+                          0 members
                         </p>
                       </div>
                     </div>
@@ -108,19 +145,18 @@ export default function Groups() {
                   </div>
 
                   <div className="mt-4 flex items-center justify-between">
-                    <div className="flex -space-x-2">
+                    {/* <div className="flex -space-x-2">
                       {group.members.map((member, index) => (
                         <Avatar key={`${member}-${index}`} letter={member} index={index} />
                       ))}
-                    </div>
+                    </div> */}
                     <span
-                      className={`rounded-full px-2.5 py-1 text-[10px] font-semibold ${
-                        group.tone === 'debt'
-                          ? 'bg-rose-500/10 text-rose-300'
-                          : group.tone === 'positive'
+                      className={`rounded-full px-2.5 py-1 text-[10px] font-semibold ${group.tone === 'debt'
+                        ? 'bg-rose-500/10 text-rose-300'
+                        : group.tone === 'positive'
                           ? 'bg-emerald-500/10 text-emerald-300'
                           : 'bg-slate-800 text-slate-400'
-                      }`}
+                        }`}
                     >
                       {group.status}
                     </span>
@@ -159,11 +195,11 @@ export default function Groups() {
                 </div>
                 <div>
                   <p className="text-[11px] text-slate-500">Shared household</p>
-                  <div className="mt-2 flex -space-x-2">
+                  {/* <div className="mt-2 flex -space-x-2">
                     {selectedGroup.members.map((member, index) => (
                       <Avatar key={`${member}-${index}`} letter={member} index={index} />
                     ))}
-                  </div>
+                  </div> */}
                 </div>
               </div>
             </header>
@@ -178,9 +214,8 @@ export default function Groups() {
                   <div className="text-right">
                     <p className="text-[10px] uppercase tracking-[0.16em] text-slate-500">Your net balance</p>
                     <p
-                      className={`mt-2 text-[13px] font-semibold ${
-                        selectedGroup.tone === 'debt' ? 'text-rose-400' : 'text-emerald-400'
-                      }`}
+                      className={`mt-2 text-[13px] font-semibold ${selectedGroup.tone === 'debt' ? 'text-rose-400' : 'text-emerald-400'
+                        }`}
                     >
                       {selectedGroup.status}
                     </p>
@@ -188,9 +223,8 @@ export default function Groups() {
                 </div>
                 <div className="mt-4 h-1 rounded-full bg-slate-800">
                   <div
-                    className={`h-1 rounded-full ${
-                      selectedGroup.tone === 'debt' ? 'w-1/3 bg-rose-500' : 'w-3/4 bg-emerald-500'
-                    }`}
+                    className={`h-1 rounded-full ${selectedGroup.tone === 'debt' ? 'w-1/3 bg-rose-500' : 'w-3/4 bg-emerald-500'
+                      }`}
                   />
                 </div>
               </div>

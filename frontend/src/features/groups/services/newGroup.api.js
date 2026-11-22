@@ -19,3 +19,12 @@ export async function createNewGroup({groupName , category , currency}) {
         throw error?.response
     }
 }
+
+export async function allGroups() {
+    try {
+        const response = await api.get("api/group/my-groups");
+        return response.data;
+    } catch (error) {
+        throw error?.response
+    }
+}

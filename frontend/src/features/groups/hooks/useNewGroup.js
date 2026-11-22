@@ -1,6 +1,6 @@
 import { useDispatch } from "react-redux";
-import { addGroup, setError, setLoading, setValidationError, } from "../states/newGroup.slice.js"; // Apne groupSlice ka sahi path check kar lena
-import { createNewGroup } from "../services/newGroup.api.js";
+import { addGroup, setError, setGroups, setLoading, setValidationError, } from "../states/newGroup.slice.js"; // Apne groupSlice ka sahi path check kar lena
+import { allGroups, createNewGroup } from "../services/newGroup.api.js";
 
 function getErrorMessage(error, fallback) {
     const data = error?.data || error?.response?.data || error;
@@ -45,5 +45,30 @@ export function useCreateGroup() {
         }
     }
 
-    return { handleCreateGroup };
+    async function handleGetAllGroups() {
+        try {
+            dispatch(setLoading(true));
+            dispatch(setError(null));
+
+            const data = await allGroups();
+
+            // Backend response se groups array nikal kar Redux mein set karo
+            const groupsList = Array.isArray(data?.groups)
+                ? data.groups
+                : Array.isArray(data?.data)
+                    ? data.data
+                    : [];
+
+            dispatch(setGroups(groupsList));
+            return groupsList;
+        } catch (error) {
+            const message = getErrorMessage(error, "Failed to fetch groups");
+            dispatch(setError(message));
+            return [];
+        }finally {
+            dispatch(setLoading(false));
+        }
+    }
+
+    return { handleCreateGroup,handleGetAllGroups };
 }

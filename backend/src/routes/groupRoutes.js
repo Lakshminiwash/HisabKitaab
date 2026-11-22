@@ -2,7 +2,7 @@ import { Router } from "express";
 import { validateAuth } from "../validators/authValidator.js";
 import { addMemberSchema, createGroupSchema } from "../validators/groupValidator.js";
 import { authenticateUser } from "../middleWares/authMiddleware.js";
-import { creatNewGroup } from "../controllers/groupController.js";
+import { allGroups, creatNewGroup } from "../controllers/groupController.js";
 
 const router = Router();
 
@@ -13,7 +13,7 @@ router.post("/create",authenticateUser,validateAuth(createGroupSchema),creatNewG
 
 // for fetch all group of the logged in user 
 // api/group/my-groups 
-// router.get("/my-groups",)
+router.get("/my-groups",authenticateUser,allGroups)
 
 // for fetch the specific detail of single group 
 // api/group/:groupId

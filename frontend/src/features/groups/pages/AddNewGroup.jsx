@@ -16,7 +16,7 @@ const currencies = ['INR', 'USD', 'EUR']
 
 export default function AddNewGroup() {
   
-  const {handleCreateGroup} = useCreateGroup();
+  const {handleCreateGroup,handleGetAllGroups} = useCreateGroup();
   const navigate = useNavigate();
 
   const [groupName, setGroupName] = useState('')
@@ -27,6 +27,7 @@ export default function AddNewGroup() {
     e.preventDefault();
     
     const created = await handleCreateGroup({ groupName, category, currency });
+    handleGetAllGroups();
     if (created) {
       setGroupName(""); // Success ke baad input clear
       navigate("/homePage/groups")

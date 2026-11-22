@@ -31,3 +31,21 @@ export const creatNewGroup = async (req,res,next) => {
         next(error)
     }
 }
+
+export const allGroups = async (req,res,next)=>{
+    try {
+        const userId = req.user._id;
+
+        // 2. Sirf wahi groups lao jo is user ne create kiye hain
+        const groups = await groupModel.find({ createdBy: userId })
+            .sort({ updatedAt: -1, createdAt: -1 })
+
+        return res.status(200).json({
+            success: true,
+            count: groups.length,
+            groups,
+        });
+    } catch (error) {
+        next(error)
+    }
+}
