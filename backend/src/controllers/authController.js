@@ -3,6 +3,7 @@ import { config } from "../configs/config.js"
 import userModel from "../models/userModel.js"
 import bcrypt from "bcryptjs"
 import User from "../models/userModel.js"
+import tokenBlackListModel from "../models/tokenBlacklistModel.js"
 
 // for token generation 
 async function generateToken(user, res, message) {
@@ -113,7 +114,28 @@ export const getMe = async (req, res, next) => {
 
 // logout
 export const logOut = async (req, res, next) => {
+
     try {
+        const token = req.cookies?.token;
+
+        if (!token) {
+            return res.status(401).json({
+                message: "unauthorized"
+            })
+        }
+
+        if (token) {
+            const decoded = jwt.decode(token)
+            const expiresAt = decoded && decoded.exp
+                    ? new Date(decoded.exp * 1000)
+                    : new Date(Date.now() + 7 * 24 * 60 * 60 * 1000); // fallback 7 days
+
+            await tokenBlackListModel.create({
+                token,
+                expiresAt,
+            });
+        }
+
         res.clearCookie("token", {
             httpOnly: true,
             sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
